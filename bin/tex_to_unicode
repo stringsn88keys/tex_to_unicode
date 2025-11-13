@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/tex_to_unicode'
+
+if ARGV.empty?
+  puts "Usage: tex_to_unicode <TeX expressions>"
+  puts "Example: tex_to_unicode '\\alpha + \\beta = \\gamma'"
+  exit 1
+end
+
+# Join all arguments with spaces
+input = ARGV.join(' ')
+
+# Convert and output
+output = TexToUnicode.convert(input)
+puts output
