@@ -1,0 +1,91 @@
+name: Version Bump
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  bump-version:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+
+      - name: Determine version bump type
+        id: bump-type
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          echo "Labels: $LABELS"
+
+          if echo "$LABELS" | grep -q "version:major"; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+            echo "Version bump: MAJOR"
+          elif echo "$LABELS" | grep -q "version:minor"; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+            echo "Version bump: MINOR"
+          elif echo "$LABELS" | grep -q "version:patch"; then
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
+            echo "Version bump: PATCH"
+          else
+            echo "bump_type=none" >> $GITHUB_OUTPUT
+            echo "No version bump label found (version:major, version:minor, or version:patch)"
+          fi
+
+      - name: Bump version
+        if: steps.bump-type.outputs.bump_type != 'none'
+        id: bump
+        run: |
+          chmod +x .github/scripts/bump_version.rb
+          NEW_VERSION=$(.github/scripts/bump_version.rb ${{ steps.bump-type.outputs.bump_type }})
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Bumped version to: $NEW_VERSION"
+
+      - name: Configure Git
+        if: steps.bump-type.outputs.bump_type != 'none'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit version bump
+        if: steps.bump-type.outputs.bump_type != 'none'
+        run: |
+          git add tex_to_unicode.gemspec
+          git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}
+
+          🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+
+      - name: Create and push tag
+        if: steps.bump-type.outputs.bump_type != 'none'
+        run: |
+          git tag -a "v${{ steps.bump.outputs.new_version }}" -m "Release v${{ steps.bump.outputs.new_version }}"
+          git push origin main
+          git push origin "v${{ steps.bump.outputs.new_version }}"
+
+      - name: Create GitHub Release
+        if: steps.bump-type.outputs.bump_type != 'none'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          release_name: Release v${{ steps.bump.outputs.new_version }}
+          body: |
+            Version ${{ steps.bump.outputs.new_version }}
+
+            Merged PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+          draft: false
+          prerelease: false
