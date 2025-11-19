@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = "tex_to_unicode"
-  spec.version = "0.1.2"
+  spec.version = "0.1.3"
   spec.authors = ["Thomas Powell"]
   spec.email = ["twilliampowell@gmail.com"]
 

@@ -42,7 +42,7 @@ tex_to_unicode 'A \rightarrow B \Rightarrow C'
 
 # Integrals and sums
 tex_to_unicode '\int_0^\infty x^2 dx'
-# Output: ∫₀^∞ x² dx
+# Output: ∫₀∞ x² dx
 
 # Set notation
 tex_to_unicode 'x \in \mathbb{R}, y \notin \emptyset'
@@ -65,9 +65,9 @@ result = TexToUnicode.convert('\alpha + \beta = \gamma')
 puts result  # => α + β = γ
 
 # Use in string interpolation
-formula = '\sum_{i=1}^n i = \frac{n(n+1)}{2}'
+formula = '\sum_{i=1}^n i'
 puts "The formula is: #{TexToUnicode.convert(formula)}"
-# Output: The formula is: ∑ᵢ₌₁ⁿ i = n(n+1)/2
+# Output: The formula is: ∑i=1ⁿ i
 ```
 
 ## Supported Symbols
@@ -102,9 +102,11 @@ The gem supports a wide range of TeX symbols including:
 - `\emptyset` (∅), `\therefore` (∴), `\because` (∵)
 
 ### Superscripts & Subscripts
-- `^0` through `^9` (⁰¹²³⁴⁵⁶⁷⁸⁹)
-- `_0` through `_9` (₀₁₂₃₄₅₆₇₈₉)
-- `^+`, `^-`, `^(`, `^)` and subscript equivalents
+- Superscripts: `^0` through `^9` (⁰¹²³⁴⁵⁶⁷⁸⁹), `^i` (ⁱ), `^n` (ⁿ)
+- Superscript symbols: `^+` (⁺), `^-` (⁻), `^=` (⁼), `^(` (⁽), `^)` (⁾)
+- Subscripts: `_0` through `_9` (₀₁₂₃₄₅₆₇₈₉)
+- Subscript symbols: `_+` (₊), `_-` (₋), `_=` (₌), `_(` (₍), `_)` (₎)
+- Note: Unicode has limited super/subscript characters; unsupported characters will display normally
 
 ### Brackets
 - `\langle`, `\rangle` (⟨⟩)
@@ -125,7 +127,7 @@ tex_to_unicode 'x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}'
 
 # Euler's identity
 tex_to_unicode 'e^{i\pi} + 1 = 0'
-# Output: eⁱᵖⁱ + 1 = 0
+# Output: eⁱπ + 1 = 0
 
 # Set theory
 tex_to_unicode 'A \cup B = \{x : x \in A \lor x \in B\}'
@@ -142,7 +144,11 @@ While Unicode provides many mathematical symbols, some TeX constructs cannot be 
 - Complex fractions are approximated
 - Matrices and arrays have limited support
 - Some accents and diacritics are approximated
-- Subscripts and superscripts support limited characters
+- **Subscripts and superscripts support limited characters** due to Unicode constraints:
+  - **Supported superscripts**: digits (⁰¹²³⁴⁵⁶⁷⁸⁹), letters i and n (ⁱⁿ), and symbols ⁺⁻⁼⁽⁾
+  - **Supported subscripts**: digits (₀₁₂₃₄₅₆₇₈₉) and symbols ₊₋₌₍₎
+  - Unsupported characters (like `^\infty`, `^\alpha`, `_\beta`) will have the `^` or `_` marker removed and display as regular characters
+  - Example: `\int_0^\infty` becomes `∫₀∞` (not `∫₀^∞` with superscript infinity, as Unicode has no superscript ∞)
 
 ## Development
 

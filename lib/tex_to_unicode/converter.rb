@@ -117,10 +117,20 @@ module TexToUnicode
     def self.convert(text)
       result = text.dup
 
+      # Remove braces used for grouping first (before conversions)
+      # This allows super/subscripts within braces to be processed
+      result.gsub!(/\{([^}]*)\}/) { $1 }
+
       # Sort by length (descending) to match longer patterns first
       TEX_TO_UNICODE.keys.sort_by { |k| -k.length }.each do |tex|
         result.gsub!(tex, TEX_TO_UNICODE[tex])
       end
+
+      # Remove unsupported superscript/subscript markers
+      # If a ^ or _ is still present after conversion, it means that character
+      # doesn't have a Unicode super/subscript equivalent, so we remove the marker
+      result.gsub!(/\^(.)/) { $1 }  # Remove ^ before any remaining character
+      result.gsub!(/_(.)/) { $1 }   # Remove _ before any remaining character
 
       result
     end
