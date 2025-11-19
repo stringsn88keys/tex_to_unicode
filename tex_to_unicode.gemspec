@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = "tex_to_unicode"
-  spec.version = "0.1.0"
+  spec.version = "0.1.1"
   spec.authors = ["Thomas Powell"]
   spec.email = ["twilliampowell@gmail.com"]
 
@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.metadata = {
-    "source_code_uri" => "https://github.com/yourusername/tex_to_unicode",
-    "bug_tracker_uri" => "https://github.com/yourusername/tex_to_unicode/issues"
+    "source_code_uri" => "https://github.com/stringsn88keys/tex_to_unicode",
+    "bug_tracker_uri" => "https://github.com/stringsn88keys/tex_to_unicode/issues"
   }
 end
